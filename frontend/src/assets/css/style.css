@@ -1,0 +1,34 @@
+#loading-div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* semi-transparent black background */
+  z-index: 9999; /* ensures the div appears on top of other elements */
+}
+
+
+.centered-div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+  }
+
+  .flexer{
+    display:flex;
+  }
+
+  .table-display{
+    border:1px solid black;
+  }
+
+  .table-display td,th{
+    border:1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+    
+  }
+
