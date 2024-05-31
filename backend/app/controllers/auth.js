@@ -1,14 +1,22 @@
 const authService = require("../services/auth");
 const { REFRESH_TOKEN_SECRET } = require("../config/auth");
+const { hashPassword } = require("../utils/util");
+const {
+  BadRequestError,
+  NotFoundError,
+  DuplicateError,
+} = require("../errors/customErrors");
+
 const jwt = require("jsonwebtoken");
 const db = require("../models");
+const Accounts = db.Accounts;
 const bcrypt = require("bcrypt");
+const { StatusCodes } = require("http-status-codes");
 
 const authController = {
   //*
   //* Log in user
   //*
-
   async loginUser(req, res) {
     const cookies = req.cookies;
     const { username, password } = req.body;
@@ -62,7 +70,42 @@ const authController = {
     });
     res.json({ accessToken, user: userData });
   },
+  //*
+  //* Register user
+  //*
+  async registerUser(req, res, next) {
+    try {
+      const { username, password, firstname, lastname } = req.body;
+      if (!username || !password || !firstname || !lastname) {
+        throw new BadRequestError("Incomplete fields");
+      }
 
+      const checkAccount = await Accounts.findOne({
+        where: { username: username },
+        attributes: ["id", "username", "password"],
+      });
+
+      if (checkAccount) {
+        throw new DuplicateError("Username already exists");
+      }
+
+      const hashedPassword = await hashPassword(password);
+
+      await Accounts.create({
+        username: username,
+        password: hashedPassword,
+        firstname: firstname,
+        lastname: lastname,
+      });
+
+      return res.status(StatusCodes.OK).send({
+        message:
+          "Account registered successfully. Please wait for the admin to approve your registration.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   //*
   //* Requesting another access token
   //*
@@ -80,7 +123,9 @@ const authController = {
 
     jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
       if (err) return res.status(403).json({ message: "Token invalid" });
-      const accessToken = authService.generateAccessToken({ username: user.username });
+      const accessToken = authService.generateAccessToken({
+        username: user.username,
+      });
       return res.json({
         message: "Refresh token success",
         accessToken: accessToken,
@@ -117,7 +162,3 @@ const authController = {
   },
 };
 module.exports = authController;
-
-
-
-

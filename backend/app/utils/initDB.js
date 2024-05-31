@@ -1,5 +1,5 @@
 const { hashPassword } = require("../utils/util");
-
+const { ACCOUNT_STATUS } = require("../utils/enums");
 require("dotenv").config();
 
 async function createSuperAdmin(Accounts) {
@@ -7,6 +7,8 @@ async function createSuperAdmin(Accounts) {
   console.log("Checking main Superadmin account...");
   const username = process.env.SUPERADMIN_DEFAULT_USERNAME;
   const password = process.env.SUPERADMIN_DEFAULT_PASS;
+  const firstname = process.env.SUPERADMIN_DEFAULT_FIRSTNAME;
+  const lastname = process.env.SUPERADMIN_DEFAULT_LASTNAME;
 
   var hashedPassword = await hashPassword(password);
 
@@ -24,6 +26,11 @@ async function createSuperAdmin(Accounts) {
     const createSuperAdmin = {
       username: username,
       password: hashedPassword,
+      firstname: firstname,
+      lastname:lastname,
+      createdBy:1,
+      status:ACCOUNT_STATUS.ACTIVE,
+
     };
     //*
     //*Save Superadmin Account in the database

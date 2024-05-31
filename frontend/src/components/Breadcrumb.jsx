@@ -13,7 +13,7 @@ export default function Breadcrumb() {
 
       return (
         <li key={crumb} className="breadcrumb-item">
-          <Link to={currentLink}>/ {crumb}</Link>
+          <Link to={currentLink}> {crumb}</Link>
         </li>
       );
     });

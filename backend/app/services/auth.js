@@ -6,13 +6,13 @@ const {
 const jwt = require("jsonwebtoken");
 const db = require("../models");
 const accounts = db.Accounts;
-
+const { ACCOUNT_STATUS } = require("../utils/enums");
 const authService = {
     async verifyUser(req) {
       const { username, password } = req.body;
   
       const checkAccount = await accounts.findOne({
-        where: { username: username },
+        where: { username: username, status:ACCOUNT_STATUS.ACTIVE},
         attributes:["id", "username", "password"],
       });
       return checkAccount;

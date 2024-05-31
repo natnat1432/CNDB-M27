@@ -30,14 +30,19 @@ export function formatTime(date) {
 export function getTableHeaders(jsonArray) {
   // Initialize a Set to store unique field names
   const allFields = new Set();
-  
+
   // Iterate through each object in the JSON array
-  jsonArray.forEach(obj => {
-      Object.keys(obj.data).forEach(key => allFields.add(key));
+  jsonArray.forEach((obj) => {
+    Object.keys(obj.data).forEach((key) => allFields.add(key));
   });
 
   // Convert the Set to a sorted array to use as table headers
   const tableHeaders = Array.from(allFields);
 
   return tableHeaders;
+}
+
+export function getErrorMessage(data){
+  const regex = /<pre>.*?<br>/;
+  return data.match(regex)[0].replaceAll("<pre>", "").replaceAll("<br>", "");
 }

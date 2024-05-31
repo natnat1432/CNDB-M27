@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   showConfirmMessage,
   showErrorMessage,
   showSuccessMessage,
   showSuccessToast,
+  getSelect,
 } from "../../utility/SwalAlert";
 import { useUploadRecordMutation } from "../../features/records/RecordsApiSlice";
 import { useSelector } from "react-redux";
@@ -16,7 +17,9 @@ const useCSVUpload = () => {
   const [isLoading, setIsLoading] = useState(false);
   const currentUser = useSelector(selectCurrentUser);
   const [uploadRecord] = useUploadRecordMutation();
-  const extractCSVHeader = useCallback(async (file) => {
+
+  const extractCSVHeader = useCallback(async (file,existingTables) => {
+
     try {
       const fileSizeLimit = 1024 * 1024; // 1 MB (adjust as needed)
       const reader = new FileReader();
@@ -87,20 +90,26 @@ const useCSVUpload = () => {
       });
 
       if (accept) {
-        const isUpload = await showConfirmMessage(
-          "Confirm Upload",
-          `Are you sure you to upload these records with the selected fields ${accept.join(
-            ", "
-          )}?`,
-          "Yes"
-        );
-        if (isUpload) {
-          async function action() {
-            setIsLoading(true);
-            await uploadCSV(file, accept);
+        const tableName = await getSelect("Select table", existingTables, "Select a table to upload data");
+        if(tableName)
+        {
+          console.log("table name", tableName)
+          const isUpload = await showConfirmMessage(
+            "Confirm Upload",
+            `Are you sure you to upload these records with the selected fields ${accept.join(
+              ", "
+            )}?`,
+            "Yes"
+          );
+          if (isUpload) {
+            async function action() {
+              setIsLoading(true);
+              await uploadCSV(file, accept, tableName);
+            }
+            showSuccessToast("Starting to upload", action);
           }
-          showSuccessToast("Starting to upload", action);
         }
+        
       }
 
       setHeader(headers);
@@ -111,10 +120,11 @@ const useCSVUpload = () => {
     }
   }, []);
 
-  const uploadCSV = async (file, fields) => {
+  const uploadCSV = async (file, fields, tableName) => {
     let formData = new FormData();
 
     formData.append("acceptedFields", fields);
+    formData.append("table", tableName);
     formData.append("createdBy", currentUser.id);
     formData.append("file", file);
 

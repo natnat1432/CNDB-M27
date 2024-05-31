@@ -14,7 +14,7 @@ export default function SignIn() {
     errors,
     onSubmit,
   } = useLogin();
-  document.title = "Log in";
+  document.title = "Sign in";
   return (
     <div id="app" className="app app-full-height app-without-header">
       <div className="login">
@@ -57,6 +57,9 @@ export default function SignIn() {
             >
               Sign In
             </button>
+            <div className="text-inverse text-opacity-50 text-center">
+              Don't have an account? <a className="nav-link" href="/signup">Sign Up</a>
+            </div>
             <div 
               className="text-center text-red "
               ref={errRef}

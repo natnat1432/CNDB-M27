@@ -43,7 +43,7 @@ export const useLogin = () => {
   useEffect(() => {
     if (token) {
       showSuccessToast("Log in successful");
-      location.href = "/dashboard";
+    location.href = "/admin/";
     }
   }, []);
 
@@ -51,7 +51,7 @@ export const useLogin = () => {
     try {
       const {data,error} = await login({ username, password });
       function action() {
-        navigate("/dashboard/");
+        navigate("/admin/");
       }
       if (data) {
         dispatch(setCredentials({ ...data }));

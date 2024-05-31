@@ -8,5 +8,11 @@ router.route("/")
       .get(authenticateToken, recordsController.findAll)
 
 router.get("/count/all", authenticateToken, recordsController.countAll);
+router.get("/tables/all", authenticateToken, recordsController.listAllTable);
+
+router.post("/tables/", authenticateToken, recordsController.addTable);
+
+router.route("/tables/:name")
+      .delete(authenticateToken, recordsController.deleteTableRecord);
 
 module.exports = router;

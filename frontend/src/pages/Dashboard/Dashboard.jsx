@@ -16,7 +16,7 @@ export default function Dashboard() {
         <a href="#" className="card text-decoration-none">
           <div className="card-body d-flex align-items-center text-inverse m-5px bg-inverse bg-opacity-10">
             <div className="flex-fill">
-              <div className="mb-1">Total Records Added</div>
+              <div className="mb-1">Total Tables Added</div>
               <h1 className="h1">{totalRecords.totalRecords}</h1>
             </div>
             <div className="opacity-5">

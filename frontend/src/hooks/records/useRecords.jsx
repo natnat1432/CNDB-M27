@@ -1,39 +1,49 @@
 import { useState, useEffect } from "react";
 import { useGetAllRecordsQuery } from "../../features/records/RecordsApiSlice";
-import { getTableHeaders } from "../../utility/Utils";
+import { getErrorMessage, getTableHeaders } from "../../utility/Utils";
+import { useParams } from "react-router-dom";
 
 export default function useRecords() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(25);
   const [order, setOrder] = useState("newest");
-  const [headers,setHeaders] = useState([]);
+  const [headers, setHeaders] = useState([]);
+  const params = useParams();
+  const [isSkipQuery, setIsSkipQuery] = useState(true);
+  const table = params.table;
+  const [tableName, setTableName] = useState("");
 
-  const info = {
+  useEffect(() => {
+    if (table && isSkipQuery == true) {
+      setTableName(table);
+      setIsSkipQuery(false);
+    }
+  }, [table]);
+
+  let info = {
     query: query,
     page: page,
     size: size,
     order: order,
+    table: tableName,
   };
-
-  
-
   const {
     data: records,
     isLoading,
     isSuccess,
     isFetching,
     isError,
+    isUninitialized,
     error: recordsError,
     refetch: refetchRecords,
-  } = useGetAllRecordsQuery(info);
+  } = useGetAllRecordsQuery(info, { skip: isSkipQuery });
 
   useEffect(() => {
-    if(records)
-    {
-      setHeaders(getTableHeaders(records.data))
+    if (records) {
+      setHeaders(getTableHeaders(records.data));
     }
-  }, [records])
+  }, [records]);
 
   const nextPage = () => {
     if (page < records?.totalPages) {
@@ -41,6 +51,7 @@ export default function useRecords() {
       setPage(page + 1);
     }
   };
+
   const previousPage = () => {
     if (page > 0) {
       window.scroll({ top: 0, behavior: "smooth" });
@@ -54,6 +65,7 @@ export default function useRecords() {
     query,
     order,
     records,
+    tableName,
     headers,
     isLoading,
     isSuccess,

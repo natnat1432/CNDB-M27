@@ -1,13 +1,29 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+
 import useCSVHeaderReader from "../../hooks/csv/useCSVUpload";
+import useListTables from "../../hooks/records/useListTables";
 import Loading from "../../components/Loading";
 
 const UploadComponent = () => {
   const { isLoading, extractCSVHeader } = useCSVHeaderReader();
+  const [existingTables, setExistingTables] = useState([]);
+  const {
+    tables
+  } = useListTables();
+
+  useEffect(() => {
+    if(tables)
+    {
+      let t = [];
+      tables.map((table) => t.push(table.name));
+      setExistingTables(t);
+    }
+  }, [tables])
+
   const onDrop = useCallback(async (acceptedFile) => {
     try {
-      await extractCSVHeader(acceptedFile[0]);
+      await extractCSVHeader(acceptedFile[0],existingTables);
     } catch (error) {
       console.error("Error reading CSV file: ", error);
     }
@@ -16,6 +32,8 @@ const UploadComponent = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   document.title = "Upload Record";
+
+
   return (
     <>
       <Loading state={isLoading} message="Uploading" />

@@ -4,8 +4,6 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
-
-
 //*
 //* Pagination helper functions
 //*
@@ -32,45 +30,57 @@ function getPagingData(fetchedData, page, limit) {
 //*
 
 async function hashPassword(password) {
-    try {
-      const hash = await bcrypt.hash(password, Number(process.env.HASH_SALT));
-      return hash;
-    } catch (err) {
-      console.error("Error hashing password", err);
-    }
+  try {
+    const hash = await bcrypt.hash(password, Number(process.env.HASH_SALT));
+    return hash;
+  } catch (err) {
+    console.error("Error hashing password", err);
   }
+}
 
 //*
 //* Used for filtering objects with only needed fields
 //*
 
-  function filterRequestBody(inputData, allowedFields) {
-    return Object.keys(inputData)
-      .filter((key) => allowedFields.includes(key))
-      .reduce((obj, key) => {
-        obj[key] = inputData[key];
-        return obj;
-      }, {});
-  }
+function filterRequestBody(inputData, allowedFields) {
+  return Object.keys(inputData)
+    .filter((key) => allowedFields.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = inputData[key];
+      return obj;
+    }, {});
+}
 
+async function emptyUploadDirectory() {
+  const directory = process.env.UPLOAD_PATH;
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err;
 
-  async function emptyUploadDirectory(){
-    const directory = process.env.UPLOAD_PATH
-    fs.readdir(directory, (err, files) => {
-      if (err) throw err;
-    
-      for (const file of files) {
-        fs.unlink(path.join(directory, file), (err) => {
-          if (err) throw err;
-        });
-      }
-    });
-  }
+    for (const file of files) {
+      fs.unlink(path.join(directory, file), (err) => {
+        if (err) throw err;
+      });
+    }
+  });
+}
+
+function removeSpacesAndTitleCase(inputString) {
+  // Remove spaces from the input string
+  let noSpaceString = inputString.replace(/\s+/g, "");
+
+  // Convert the string to title case
+  let titleCaseString = noSpaceString.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+  });
+
+  return titleCaseString;
+}
 
 module.exports = {
-    hashPassword,
-    filterRequestBody,
-    emptyUploadDirectory,
-    getPagination,
-    getPagingData
-}
+  hashPassword,
+  filterRequestBody,
+  emptyUploadDirectory,
+  getPagination,
+  getPagingData,
+  removeSpacesAndTitleCase
+};
